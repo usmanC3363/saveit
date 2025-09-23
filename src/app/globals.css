@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-white text-dark-200 min-h-screen;
+    @apply min-h-screen bg-white text-dark-200;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -112,40 +112,40 @@
 @layer utilities {
   /* ===== TYPOGRAPHY */
   .h1 {
-    @apply text-[34px] leading-[42px] font-bold;
+    @apply text-[34px] font-bold leading-[42px];
   }
   .h2 {
-    @apply text-[24px] leading-[36px] font-bold;
+    @apply text-[24px] font-bold leading-[36px];
   }
   .h3 {
-    @apply text-[20px] leading-[28px] font-semibold;
+    @apply text-[20px] font-semibold leading-[28px];
   }
   .h4 {
-    @apply text-[18px] leading-[20px] font-medium;
+    @apply text-[18px] font-medium leading-[20px];
   }
   .h5 {
-    @apply text-[16px] leading-[24px] font-semibold;
+    @apply text-[16px] font-semibold leading-[24px];
   }
   .subtitle-1 {
-    @apply text-[16px] leading-[24px] font-medium;
+    @apply text-[16px] font-medium leading-[24px];
   }
   .subtitle-2 {
-    @apply text-[14px] leading-[20px] font-semibold;
+    @apply text-[14px] font-semibold leading-[20px];
   }
   .body-1 {
-    @apply text-[16px] leading-[24px] font-normal;
+    @apply text-[16px] font-normal leading-[24px];
   }
   .body-2 {
-    @apply text-[14px] leading-[20px] font-normal;
+    @apply text-[14px] font-normal leading-[20px];
   }
   .button {
-    @apply text-[14px] leading-[20px] font-medium;
+    @apply text-[14px] font-medium leading-[20px];
   }
   .caption {
-    @apply text-[12px] leading-[16px] font-normal;
+    @apply text-[12px] font-normal leading-[16px];
   }
   .overline {
-    @apply text-[10px] leading-[14px] font-normal;
+    @apply text-[10px] font-normal leading-[14px];
   }
 
   /* ===== HELPER CLASSES */
@@ -153,7 +153,7 @@
     @apply mx-auto max-w-7xl px-5;
   }
   .primary-btn {
-    @apply bg-brand hover:bg-brand-100 transition-all rounded-full button !important;
+    @apply button rounded-full bg-brand transition-all hover:bg-brand-100 !important;
   }
   .flex-center {
     @apply flex items-center justify-center;
@@ -164,29 +164,29 @@
     @apply outline-none ring-offset-transparent focus:ring-transparent focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
   }
   .shad-input {
-    @apply border-none shadow-none p-0 shad-no-focus placeholder:text-light-200 body-2 !important;
+    @apply shad-no-focus body-2 border-none p-0 shadow-none placeholder:text-light-200 !important;
   }
 
   .shad-form-item {
     @apply flex h-[78px] flex-col justify-center rounded-xl border border-light-300 px-4 shadow-drop-1;
   }
   .shad-form-label {
-    @apply text-light-100 pt-2 body-2 w-full !important;
+    @apply body-2 w-full pt-2 text-light-100 !important;
   }
   .shad-form-message {
-    @apply text-red body-2 ml-4 !important;
+    @apply body-2 ml-4 text-red !important;
   }
   .shad-alert-dialog {
-    @apply space-y-4 max-w-[95%] sm:w-fit rounded-xl md:rounded-[30px] px-4 md:px-8 py-10 bg-white outline-none !important;
+    @apply max-w-[95%] space-y-4 rounded-xl bg-white px-4 py-10 outline-none sm:w-fit md:rounded-[30px] md:px-8 !important;
   }
   .shad-submit-btn {
-    @apply bg-brand button hover:bg-brand-100 transition-all rounded-full !important;
+    @apply button rounded-full bg-brand transition-all hover:bg-brand-100 !important;
   }
   .shad-otp {
-    @apply w-full flex gap-1 sm:gap-2 justify-between !important;
+    @apply flex w-full justify-between gap-1 sm:gap-2 !important;
   }
   .shad-otp-slot {
-    @apply text-[40px] font-medium rounded-xl ring-brand shadow-drop-1 text-brand-100 justify-center flex border-2 border-light-300 size-12 md:size-16 gap-5 !important;
+    @apply flex size-12 justify-center gap-5 rounded-xl border-2 border-light-300 text-[40px] font-medium text-brand-100 shadow-drop-1 ring-brand md:size-16 !important;
   }
 
   .shad-sheet {
@@ -194,13 +194,13 @@
   }
   .shad-sheet button,
   .shad-dialog button {
-    @apply focus:ring-0 focus:ring-offset-0 focus-visible:border-none outline-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+    @apply outline-none focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:outline-none focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
   }
   .shad-dropdown-item {
     @apply cursor-pointer !important;
   }
   .shad-dialog {
-    @apply rounded-[26px] w-[90%] max-w-[400px] px-6 py-8   !important;
+    @apply w-[90%] max-w-[400px] rounded-[26px] px-6 py-8 !important;
   }
   .shad-chart-title {
     @apply text-white !important;
@@ -211,10 +211,10 @@
 
   /* Sidebar & MobileNavigation */
   .nav-icon {
-    @apply w-6 filter invert opacity-25 !important;
+    @apply w-6 opacity-25 invert filter !important;
   }
   .nav-icon-active {
-    @apply invert-0 opacity-100 !important;
+    @apply opacity-100 invert-0 !important;
   }
 
   /* =====  STYLE CLASSES */
@@ -244,10 +244,10 @@
     @apply h5 relative z-20 text-center !important;
   }
   .dashboard-recent-files {
-    @apply h-full rounded-[20px] xl:h-[654px] custom-scrollbar overflow-auto bg-white p-5 xl:p-7 !important;
+    @apply custom-scrollbar h-full overflow-auto rounded-[20px] bg-white p-5 xl:h-[654px] xl:p-7 !important;
   }
   .recent-file-details {
-    @apply flex w-full justify-between items-center !important;
+    @apply flex w-full items-center justify-between !important;
   }
   .recent-file-name {
     @apply subtitle-2 line-clamp-1 w-full text-light-100 sm:max-w-[200px] lg:max-w-[250px] !important;
@@ -264,7 +264,7 @@
     @apply mx-auto flex w-full max-w-7xl flex-col items-center gap-8 !important;
   }
   .total-size-section {
-    @apply flex mt-2 flex-col justify-between sm:flex-row sm:items-center !important;
+    @apply mt-2 flex flex-col justify-between sm:flex-row sm:items-center !important;
   }
   .file-list {
     @apply grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 !important;
@@ -367,14 +367,14 @@
     @apply fixed bottom-10 right-10 z-50 flex size-full h-fit max-w-[480px] flex-col gap-3 rounded-[20px] bg-white p-7 shadow-drop-3 !important;
   }
   .uploader-preview-item {
-    @apply flex items-center justify-between  gap-3 rounded-xl p-3 shadow-drop-3 !important;
+    @apply flex items-center justify-between gap-3 rounded-xl p-3 shadow-drop-3 !important;
   }
   .preview-item-name {
     @apply subtitle-2 mb-2 line-clamp-1 max-w-[300px] !important;
   }
 
   .error-toast {
-    @apply bg-red !rounded-[10px] !important;
+    @apply !rounded-[10px] bg-red !important;
   }
 
   /* Header */
@@ -405,7 +405,7 @@
     @apply flex flex-1 flex-col gap-4 !important;
   }
   .mobile-nav-item {
-    @apply flex text-light-100 gap-4 w-full justify-start items-center h5 px-6 h-[52px] rounded-full !important;
+    @apply h5 flex h-[52px] w-full items-center justify-start gap-4 rounded-full px-6 text-light-100 !important;
   }
   .mobile-sign-out-button {
     @apply h5 flex h-[52px] w-full items-center gap-4 rounded-full bg-brand/10 px-6 text-brand shadow-none transition-all hover:bg-brand/20 !important;
@@ -413,7 +413,7 @@
 
   /* OTP Modal */
   .otp-close-button {
-    @apply absolute -right-1 -top-7 cursor-pointer sm:-right-2 sm:-top-4  !important;
+    @apply absolute -right-1 -top-7 cursor-pointer sm:-right-2 sm:-top-4 !important;
   }
 
   /* Search */
@@ -424,7 +424,7 @@
     @apply flex h-[52px] flex-1 items-center gap-3 rounded-full px-4 shadow-drop-3 !important;
   }
   .search-input {
-    @apply body-2 shad-no-focus  placeholder:body-1 w-full border-none p-0 shadow-none placeholder:text-light-200 !important;
+    @apply body-2 shad-no-focus placeholder:body-1 w-full border-none p-0 shadow-none placeholder:text-light-200 !important;
   }
   .search-result {
     @apply absolute left-0 top-16 z-50 flex w-full flex-col gap-3 rounded-[20px] bg-white p-4 !important;
@@ -441,7 +441,7 @@
     @apply h5 mt-9 flex-1 gap-1 text-brand !important;
   }
   .sidebar-nav-item {
-    @apply flex text-light-100 gap-4 rounded-xl lg:w-full justify-center lg:justify-start items-center h5 lg:px-[30px] h-[52px] lg:rounded-full !important;
+    @apply h5 flex h-[52px] items-center justify-center gap-4 rounded-xl text-light-100 lg:w-full lg:justify-start lg:rounded-full lg:px-[30px] !important;
   }
   .sidebar-user-info {
     @apply mt-4 flex items-center justify-center gap-2 rounded-full bg-brand/10 p-1 text-light-100 lg:justify-start lg:p-3 !important;
@@ -470,8 +470,6 @@
     @apply size-full object-cover object-center !important;
   }
 }
-
-
 
 @layer base {
   * {
