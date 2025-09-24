@@ -30,18 +30,63 @@ export const uploadFile = async ({
       inputFile,
     );
 
-    const fileDocument = {
-      type: getFileType(bucketFile.name).type,
-      name: bucketFile.name,
-      url: constructFileUrl(bucketFile.$id),
-      extension: getFileType(bucketFile.name).extension,
-      size: bucketFile.sizeOriginal,
-      owner: ownerId,
-      accountId,
-      users: [],
-      bucketFileId: bucketFile.$id,
+    // inside uploadFile (replace the part after bucketFile assignment)
+    const attrsResp = await databases.listAttributes(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesCollectionId,
+    );
+
+    // normalize attribute list (older SDK shapes vary)
+    const attrsArray = Array.isArray(attrsResp.attributes)
+      ? attrsResp.attributes
+      : Array.isArray(attrsResp)
+        ? attrsResp
+        : [];
+
+    // Build a set of existing attribute keys (case-sensitive)
+    const existingKeys = new Set<string>(
+      attrsArray.map((a: any) => a.key ?? a.$id).filter(Boolean),
+    );
+
+    // Helper to pick the correct key from a list of candidates
+    const pickKey = (...candidates: string[]) => {
+      for (const k of candidates) {
+        if (existingKeys.has(k)) return k;
+      }
+      return null;
     };
 
+    // Map known field variants to values only when the attribute exists
+    const fileDocument: Record<string, any> = {};
+
+    // always include fields that are almost surely present: name/url/type/size/extension/owner/users
+    if (pickKey("name")) fileDocument.name = bucketFile.name;
+    if (pickKey("url")) fileDocument.url = constructFileUrl(bucketFile.$id);
+    if (pickKey("type")) fileDocument.type = getFileType(bucketFile.name).type;
+    if (pickKey("extension"))
+      fileDocument.extension = getFileType(bucketFile.name).extension;
+    if (pickKey("size")) fileDocument.size = bucketFile.sizeOriginal;
+    if (pickKey("owner")) fileDocument.owner = ownerId;
+
+    // account id is tricky: collection might expect "accountID" or "accountId"
+    const accountKey = pickKey("accountID", "accountId", "account_id");
+    if (accountKey) fileDocument[accountKey] = accountId;
+
+    // bucket/file reference variations
+    const bucketFileKey = pickKey(
+      "bucketFileId",
+      "bucket_file_id",
+      "bucketFile",
+      "bucket_file",
+      "bucketField",
+    );
+    if (bucketFileKey) fileDocument[bucketFileKey] = bucketFile.$id;
+
+    // users array
+    if (pickKey("users")) fileDocument.users = [];
+
+    // If some keys you expect are missing, we still include the most essential ones (name + url) above.
+    // Attempt to create the document
     const newFile = await databases
       .createDocument(
         appwriteConfig.databaseId,

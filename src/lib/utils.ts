@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+// helper func, used for stringifying long json inputs (values) to store in database
 export const parseStringify = (value: unknown) =>
   JSON.parse(JSON.stringify(value));
 

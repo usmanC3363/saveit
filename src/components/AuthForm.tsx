@@ -53,6 +53,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
     console.log(values);
 
     try {
+      // checking for type of signing?
       const user =
         type === "sign-up"
           ? await createAccount({
