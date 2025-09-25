@@ -7,6 +7,7 @@ import { parseStringify } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { avatarPlaceholderUrl } from "@/constants";
 import { redirect } from "next/navigation";
+import { UserDocument } from "../../../types";
 
 const handleError = (error: unknown, message: string) => {
   console.error(message, error);
@@ -184,13 +185,32 @@ export const verifySecret = async ({
   }
 };
 
-export const getCurrentUser = async () => {
+// export const getCurrentUser = async () => {
+//   try {
+//     const { databases, account } = await createSessionClient();
+
+//     const result = await account.get();
+
+//     const user = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.usersCollectionId,
+//       [Query.equal("accountId", result.$id)],
+//     );
+
+//     if (user.total <= 0) return null;
+
+//     return parseStringify(user.documents[0]);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+export const getCurrentUser = async (): Promise<UserDocument | null> => {
   try {
     const { databases, account } = await createSessionClient();
-
     const result = await account.get();
 
-    const user = await databases.listDocuments(
+    const user = await databases.listDocuments<UserDocument>(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
       [Query.equal("accountId", result.$id)],
@@ -201,6 +221,7 @@ export const getCurrentUser = async () => {
     return parseStringify(user.documents[0]);
   } catch (error) {
     console.log(error);
+    return null;
   }
 };
 

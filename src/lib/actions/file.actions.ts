@@ -3,10 +3,19 @@
 import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { InputFile } from "node-appwrite/file";
 import { appwriteConfig } from "@/lib/appwrite/config";
-import { ID, Models, Query } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { constructFileUrl, getFileType, parseStringify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/actions/user.actions";
+import {
+  DeleteFileProps,
+  FileType,
+  GetFilesProps,
+  RenameFileProps,
+  UpdateFileUsersProps,
+  UploadFileProps,
+  UserDocument,
+} from "../../../types";
 
 const handleError = (error: unknown, message: string) => {
   console.log(error, message);
@@ -22,12 +31,14 @@ export const uploadFile = async ({
   const { storage, databases } = await createAdminClient();
 
   try {
+    // coming from node-appwrite
     const inputFile = InputFile.fromBuffer(file, file.name);
 
     const bucketFile = await storage.createFile(
       appwriteConfig.bucketId,
       ID.unique(),
       inputFile,
+      // [Permission.read(Role.any())], // <- allow public read
     );
 
     // inside uploadFile (replace the part after bucketFile assignment)
@@ -106,27 +117,29 @@ export const uploadFile = async ({
   }
 };
 
+// ------------------- replace createQueries with this -------------------
 const createQueries = (
-  currentUser: Models.Document,
+  currentUser: UserDocument,
   types: string[],
   searchText: string,
   sort: string,
   limit?: number,
 ) => {
-  const queries = [
-    Query.or([
-      Query.equal("owner", [currentUser.$id]),
-      Query.contains("users", [currentUser.email]),
-    ]),
-  ];
+  // Build the OR clause: owner equals current user's doc id OR users array contains the user's email (if present)
+  const orClauses = [Query.equal("owner", [currentUser.$id])];
+  if (currentUser.email) {
+    orClauses.push(Query.contains("users", [currentUser.email]));
+  }
 
+  const queries: any[] = [Query.or(orClauses)];
+  // type filtering
   if (types.length > 0) queries.push(Query.equal("type", types));
+
   if (searchText) queries.push(Query.contains("name", searchText));
   if (limit) queries.push(Query.limit(limit));
 
   if (sort) {
     const [sortBy, orderBy] = sort.split("-");
-
     queries.push(
       orderBy === "asc" ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
     );
@@ -135,6 +148,7 @@ const createQueries = (
   return queries;
 };
 
+// ------------------- replace getFiles with this -------------------
 export const getFiles = async ({
   types = [],
   searchText = "",
@@ -150,18 +164,146 @@ export const getFiles = async ({
 
     const queries = createQueries(currentUser, types, searchText, sort, limit);
 
-    const files = await databases.listDocuments(
+    const filesResp = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.filesCollectionId,
       queries,
     );
 
-    console.log({ files });
-    return parseStringify(files);
+    const files = Array.isArray(filesResp.documents) ? filesResp.documents : [];
+
+    // Collect unique owner ids (owner can be a string id or an object)
+    const ownerIds = Array.from(
+      new Set(
+        files
+          .map((f: any) => {
+            if (!f) return null;
+            if (typeof f.owner === "string") return f.owner;
+            if (typeof f.owner === "object" && f.owner !== null)
+              return f.owner.$id ?? null;
+            return null;
+          })
+          .filter(Boolean),
+      ),
+    );
+
+    // Map ownerId -> user document
+    const ownerMap: Record<string, any> = {};
+
+    await Promise.all(
+      ownerIds.map(async (ownerId) => {
+        try {
+          // try getting by document id first
+          const userDoc = await databases.getDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            ownerId,
+          );
+          ownerMap[ownerId] = userDoc;
+        } catch (err) {
+          // fallback: try finding by accountId
+          try {
+            const byAccount = await databases.listDocuments(
+              appwriteConfig.databaseId,
+              appwriteConfig.usersCollectionId,
+              [Query.equal("accountId", [ownerId]), Query.limit(1)],
+            );
+            if (byAccount.total > 0) {
+              ownerMap[ownerId] = byAccount.documents[0];
+              return;
+            }
+            // fallback: try email match
+            const byEmail = await databases.listDocuments(
+              appwriteConfig.databaseId,
+              appwriteConfig.usersCollectionId,
+              [Query.equal("email", [ownerId]), Query.limit(1)],
+            );
+            if (byEmail.total > 0) {
+              ownerMap[ownerId] = byEmail.documents[0];
+            }
+          } catch (err2) {
+            // ignore - ownerMap[ownerId] stays undefined
+          }
+        }
+      }),
+    );
+
+    // Attach resolved owner object (if found) to each file doc
+    const filesWithOwners = files.map((f: any) => {
+      const ownerIdValue =
+        typeof f.owner === "string" ? f.owner : (f.owner?.$id ?? null);
+      const resolvedOwner = ownerIdValue ? ownerMap[ownerIdValue] : null;
+      return {
+        ...f,
+        owner: resolvedOwner ?? f.owner, // if resolved use full doc, otherwise keep original (string or object)
+      };
+    });
+
+    // Return same structure as Appwrite but with documents replaced
+    const out = { ...filesResp, documents: filesWithOwners };
+    return parseStringify(out);
   } catch (error) {
     handleError(error, "Failed to get files");
   }
 };
+
+// const createQueries = (
+//   currentUser: UserDocument,
+//   types: string[],
+//   searchText: string,
+//   sort: string,
+//   limit?: number,
+// ) => {
+//   const queries = [
+//     Query.or([
+//       Query.equal("owner", [currentUser.$id]),
+//       Query.contains("users", [currentUser.email]),
+//     ]),
+//   ];
+
+//   if (types.length > 0) queries.push(Query.equal("type", types));
+//   if (searchText) queries.push(Query.contains("name", searchText));
+//   if (limit) queries.push(Query.limit(limit));
+
+//   if (sort) {
+//     const [sortBy, orderBy] = sort.split("-");
+
+//     queries.push(
+//       orderBy === "asc" ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
+//     );
+//   }
+
+//   return queries;
+// };
+
+// export const getFiles = async ({
+//   types = [],
+//   searchText = "",
+//   sort = "$createdAt-desc",
+//   limit,
+// }: GetFilesProps) => {
+//   const { databases } = await createAdminClient();
+
+//   try {
+//     const currentUser = await getCurrentUser();
+
+//     if (!currentUser) throw new Error("User not found");
+
+//     const queries = createQueries(currentUser, types, searchText, sort, limit);
+//     // console.log({ currentUser, queries });
+
+//     const files = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.filesCollectionId,
+//       queries,
+//     );
+
+//     // console.log({ files });
+//     return parseStringify(files);
+//   } catch (error) {
+//     handleError(error, "Failed to get files");
+//   }
+// };
 
 export const renameFile = async ({
   fileId,

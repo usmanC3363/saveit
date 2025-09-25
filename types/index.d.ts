@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import type { Models } from "appwrite";
 
 declare type FileType = "document" | "image" | "video" | "audio" | "other";
 
@@ -69,8 +70,16 @@ declare interface ThumbnailProps {
   imageClassName?: string;
 }
 
+export type UserDocument = Models.Document & {
+  accountId: string;
+  email: string;
+  name?: string;
+  fullName?: string;
+  // add any other attributes you added in the Appwrite Console
+};
+
 declare interface ShareInputProps {
-  file: Models.Document;
+  file: UserDocument;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemove: (email: string) => void;
 }

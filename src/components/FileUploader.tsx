@@ -26,6 +26,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
     async (acceptedFiles: File[]) => {
       setFiles(acceptedFiles);
 
+      // Max file size logic
       const uploadPromises = acceptedFiles.map(async (file) => {
         if (file.size > MAX_FILE_SIZE) {
           setFiles((prevFiles) =>
@@ -43,6 +44,7 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
           });
         }
 
+        // removing the uploaded file from the queue
         return uploadFile({ file, ownerId, accountId, path }).then(
           (uploadedFile) => {
             if (uploadedFile) {
