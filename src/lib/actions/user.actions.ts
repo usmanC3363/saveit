@@ -16,12 +16,12 @@ const handleError = (error: unknown, message: string) => {
 
 const isProd = process.env.NODE_ENV === "production";
 
-const sessionCookieOptions = {
-  path: "/",
-  httpOnly: true,
-  sameSite: isProd ? "strict" : "lax", // use 'lax' in dev to be less restrictive
-  secure: isProd, // secure only in production (HTTPS)
-};
+// const sessionCookieOptions = {
+//   path: "/",
+//   httpOnly: true,
+//   sameSite: isProd ? "strict" : "lax", // use 'lax' in dev to be less restrictive
+//   secure: isProd, // secure only in production (HTTPS)
+// };
 
 /**
  * Ensure a single string attribute exists on a collection; create it if missing.
