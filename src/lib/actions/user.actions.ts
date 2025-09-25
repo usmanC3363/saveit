@@ -14,6 +14,15 @@ const handleError = (error: unknown, message: string) => {
   throw error;
 };
 
+const isProd = process.env.NODE_ENV === "production";
+
+const sessionCookieOptions = {
+  path: "/",
+  httpOnly: true,
+  sameSite: isProd ? "strict" : "lax", // use 'lax' in dev to be less restrictive
+  secure: isProd, // secure only in production (HTTPS)
+};
+
 /**
  * Ensure a single string attribute exists on a collection; create it if missing.
  */
@@ -175,8 +184,8 @@ export const verifySecret = async ({
     (await cookies()).set("appwrite-session", session.secret, {
       path: "/",
       httpOnly: true,
-      sameSite: "strict",
-      secure: true,
+      sameSite: isProd ? "strict" : "lax",
+      secure: isProd,
     });
 
     return parseStringify({ sessionId: session.$id });

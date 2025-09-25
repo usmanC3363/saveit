@@ -12,6 +12,7 @@ import { useDebounce } from "use-debounce";
 import { UserDocument } from "../../types";
 const Search = () => {
   const [query, setQuery] = useState("");
+  // used in a client component
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
   const [results, setResults] = useState<UserDocument[]>([]);
@@ -54,12 +55,14 @@ const Search = () => {
   return (
     <div className="search">
       <div className="search-input-wrapper">
+        {/* SEARCH ICON */}
         <Image
           src="/assets/icons/search.svg"
           alt="Search"
           width={24}
           height={24}
         />
+        {/* SEARCH INPUT */}
         <Input
           value={query}
           placeholder="Search..."

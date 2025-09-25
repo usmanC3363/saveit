@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "100MB",
     },
+    allowedDevOrigins: ["http://192.168.0.106:3000"],
   },
   /* config options here */
   images: {
